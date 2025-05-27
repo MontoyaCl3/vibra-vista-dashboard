@@ -1,9 +1,10 @@
 // hooks/useMqtt.js
-import { useEffect, useState } from 'react';
+import { useEffect } from 'react';
 import mqtt from 'mqtt';
+import useMqttStore from '../store/useMqttStore';
 
 const useMqtt = (routingKey) => {
-  const [messages, setMessages] = useState([]);
+  const addMessage = useMqttStore((state) => state.addMessage);
 
   useEffect(() => {
     const options = {
@@ -21,13 +22,9 @@ const useMqtt = (routingKey) => {
 
     client.on('connect', () => {
       console.log('Connected to MQTT broker');
-
       client.subscribe(routingKey, (err) => {
-        if (err) {
-          console.error('Subscription error:', err);
-        } else {
-          console.log('Subscribed to', routingKey);
-        }
+        if (err) console.error('Subscription error:', err);
+        else console.log('Subscribed to', routingKey);
       });
     });
 
@@ -35,7 +32,7 @@ const useMqtt = (routingKey) => {
       if (topic === routingKey) {
         try {
           const json = JSON.parse(message.toString());
-          setMessages((prev) => [json, ...prev]);
+          addMessage(json);
         } catch (e) {
           console.warn('Invalid JSON:', message.toString());
         }
@@ -51,9 +48,7 @@ const useMqtt = (routingKey) => {
         console.log('MQTT client disconnected cleanly');
       });
     };
-  }, [routingKey]);
-
-  return messages;
+  }, [routingKey, addMessage]);
 };
 
 export default useMqtt;

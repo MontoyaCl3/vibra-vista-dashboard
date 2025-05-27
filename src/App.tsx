@@ -15,7 +15,7 @@ const queryClient = new QueryClient();
 
 const App = () => {
   const routingKey = 'CTC/access360/49240044/dyn/vib/notify/lite';
-  const messages = useMqtt(routingKey);
+  useMqtt(routingKey);
 
   return(
   <QueryClientProvider client={queryClient}>
