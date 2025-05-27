@@ -37,6 +37,7 @@ import { Button } from "@/components/ui/button";
 import { Download } from "lucide-react";
 import useMqttStore from '../store/useMqttStore';
 import mqtt from "mqtt";
+import CreateGraph from "../components/graphs/CreateGraph"
 
 // Generate mock data for visualizations
 const generateMockData = (dataPoints = 24) => {
@@ -56,60 +57,6 @@ const generateMockData = (dataPoints = 24) => {
   return data;
 };
 
-const CreateGraph = (props) =>{
-  const messages = useMqttStore((state) => state.messages);
-  console.log(messages)
-  var displayData = []
-  for(var i = 0;i<messages.length;i++){
-    displayData.push(messages[i].Reading)
-  }
-console.log(displayData)
-  displayData = displayData.reverse()
-  return(
-    <ResponsiveContainer width="100%" height="100%">
-                  <LineChart data={displayData} margin={{ top: 5, right: 30, left: 20, bottom: 5 }}>
-                    <CartesianGrid strokeDasharray="3 3" />
-                    <XAxis dataKey="Time" />
-                    <YAxis label={{ value: 'Vibración (mm/s)', angle: -90, position: 'insideLeft' }} />
-                    <Tooltip />
-                    <Legend />
-                    {(props.sensor === "all" || props.sensor === "sensor1") && (
-                      <Line 
-                        type="monotone" 
-                        dataKey="Xpk" 
-                        name="Sensor 1" 
-                        stroke={colors.sensor1} 
-                        activeDot={{ r: 8 }} 
-                      />
-                    )}
-                    {(props.sensor === "all" || props.sensor === "sensor2") && (
-                      <Line 
-                        type="monotone" 
-                        dataKey="sensor2" 
-                        name="Sensor 2" 
-                        stroke={colors.sensor2} 
-                      />
-                    )}
-                    {(props.sensor === "all" || props.sensor === "sensor3") && (
-                      <Line 
-                        type="monotone" 
-                        dataKey="sensor3" 
-                        name="Sensor 3" 
-                        stroke={colors.sensor3} 
-                      />
-                    )}
-                    {(props.sensor === "all" || props.sensor === "sensor4") && (
-                      <Line 
-                        type="monotone" 
-                        dataKey="sensor4" 
-                        name="Sensor 4" 
-                        stroke={colors.sensor4} 
-                      />
-                    )}
-                  </LineChart>
-                </ResponsiveContainer>
-  )
-}
 
 // Mock data for visualizations
 const hourlyData = generateMockData();
@@ -165,11 +112,10 @@ const Visualization = () => {
                 <SelectValue placeholder="Seleccionar sensor" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="all">Todos los sensores</SelectItem>
+                <SelectItem value="all">Todos sensores</SelectItem>
                 <SelectItem value="sensor1">Sensor 1</SelectItem>
                 <SelectItem value="sensor2">Sensor 2</SelectItem>
                 <SelectItem value="sensor3">Sensor 3</SelectItem>
-                <SelectItem value="sensor4">Sensor 4</SelectItem>
               </SelectContent>
             </Select>
             
@@ -181,7 +127,7 @@ const Visualization = () => {
         <CardContent>
           <Tabs defaultValue="line">
             <TabsList>
-              <TabsTrigger value="line">Overall</TabsTrigger>
+              <TabsTrigger value="line">Todos los ejes</TabsTrigger>
               <TabsTrigger value="area">Eje X</TabsTrigger>
               <TabsTrigger value="bar">Eje Y</TabsTrigger>
               <TabsTrigger value="pie">Eje Z</TabsTrigger>
