@@ -24,7 +24,15 @@ const DashboardHeader: React.FC<DashboardHeaderProps> = ({
         >
           <Menu className="h-5 w-5" />
         </Button>
-        <h1 className="text-xl font-medium">{title}</h1>
+        <div className="flex items-center space-x-4">
+          <img 
+            src="/lovable-uploads/51a3b95a-4eef-4ce0-94d7-ac5f812b73f9.png" 
+            alt="PYMEX Logo" 
+            className="h-8 w-auto"
+          />
+          <div className="h-6 w-px bg-gray-300"></div>
+          <h1 className="text-xl font-medium text-dashboard-text">{title}</h1>
+        </div>
       </div>
       <div className="flex items-center space-x-4">
         <span className="text-sm text-dashboard-secondaryText">

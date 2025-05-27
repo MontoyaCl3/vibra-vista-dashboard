@@ -63,21 +63,22 @@ export default {
 					border: 'hsl(var(--sidebar-border))',
 					ring: 'hsl(var(--sidebar-ring))'
 				},
-				// Custom colors for our vibration sensor dashboard
+				// Updated PYMEX brand colors to match the logo
 				brand: {
-					DEFAULT: '#e91a2f',
-					light: '#f8505f',
-					dark: '#c1091d',
+					DEFAULT: '#E53E3E', // PYMEX red from logo
+					light: '#FC8181',
+					dark: '#C53030',
+					black: '#2D3748', // PYMEX black/dark gray from logo
 				},
 				dashboard: {
-					background: '#f7fafc',
+					background: '#f8fafc',
 					card: '#ffffff',
-					text: '#1a202c',
+					text: '#2D3748', // Using PYMEX black for main text
 					secondaryText: '#718096',
-					header: '#2d3748',
+					header: '#2D3748', // Using PYMEX black for header
 					success: '#38a169',
 					warning: '#f6ad55',
-					danger: '#e53e3e',
+					danger: '#E53E3E', // Using PYMEX red for danger
 				}
 			},
 			borderRadius: {

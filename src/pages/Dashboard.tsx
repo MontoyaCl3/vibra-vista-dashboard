@@ -5,21 +5,21 @@ import SensorStatusCard from "@/components/sensors/SensorStatusCard";
 import RecentAlerts from "@/components/sensors/RecentAlerts";
 import SystemStatus from "@/components/sensors/SystemStatus";
 
-// Mock data for sensors
+// Mock data for sensors with proper typing
 const mockSensors = [
-  { id: 1, name: "Sensor 1", location: "Área A", status: "online", value: 23.5, unit: "Hz" },
-  { id: 2, name: "Sensor 2", location: "Área B", status: "warning", value: 46.2, unit: "Hz" },
-  { id: 3, name: "Sensor 3", location: "Área C", status: "offline", value: 0, unit: "Hz" },
-  { id: 4, name: "Sensor 4", location: "Área D", status: "online", value: 18.7, unit: "Hz" },
-  { id: 5, name: "Sensor 5", location: "Área E", status: "online", value: 31.4, unit: "Hz" },
-  { id: 6, name: "Sensor 6", location: "Área F", status: "online", value: 27.8, unit: "Hz" },
+  { id: 1, name: "Sensor 1", location: "Área A", status: "online" as const, value: 23.5, unit: "Hz" },
+  { id: 2, name: "Sensor 2", location: "Área B", status: "warning" as const, value: 46.2, unit: "Hz" },
+  { id: 3, name: "Sensor 3", location: "Área C", status: "offline" as const, value: 0, unit: "Hz" },
+  { id: 4, name: "Sensor 4", location: "Área D", status: "online" as const, value: 18.7, unit: "Hz" },
+  { id: 5, name: "Sensor 5", location: "Área E", status: "online" as const, value: 31.4, unit: "Hz" },
+  { id: 6, name: "Sensor 6", location: "Área F", status: "online" as const, value: 27.8, unit: "Hz" },
 ];
 
-// Mock data for alerts
+// Mock data for alerts with proper typing
 const mockAlerts = [
-  { id: 1, sensorId: 2, message: "Vibración excesiva detectada", severity: "warning", time: "Hace 30 min" },
-  { id: 2, sensorId: 3, message: "Pérdida de conexión", severity: "error", time: "Hace 2 horas" },
-  { id: 3, sensorId: 2, message: "Umbral de vibración superado", severity: "warning", time: "Hace 1 día" },
+  { id: 1, sensorId: 2, message: "Vibración excesiva detectada", severity: "warning" as const, time: "Hace 30 min" },
+  { id: 2, sensorId: 3, message: "Pérdida de conexión", severity: "error" as const, time: "Hace 2 horas" },
+  { id: 3, sensorId: 2, message: "Umbral de vibración superado", severity: "warning" as const, time: "Hace 1 día" },
 ];
 
 const Dashboard = () => {
