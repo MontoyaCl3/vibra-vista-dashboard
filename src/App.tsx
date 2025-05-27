@@ -9,10 +9,15 @@ import Dashboard from "./pages/Dashboard";
 import Configuration from "./pages/Configuration";
 import Visualization from "./pages/Visualization";
 import NotFound from "./pages/NotFound";
+import useMqtt from "./hooks/useMqtt";
 
 const queryClient = new QueryClient();
 
-const App = () => (
+const App = () => {
+  const routingKey = 'CTC/access360/49240044/dyn/vib/notify/lite';
+  const messages = useMqtt(routingKey);
+
+  return(
   <QueryClientProvider client={queryClient}>
     <TooltipProvider>
       <Toaster />
@@ -48,6 +53,7 @@ const App = () => (
       </BrowserRouter>
     </TooltipProvider>
   </QueryClientProvider>
-);
+  )
+};
 
 export default App;

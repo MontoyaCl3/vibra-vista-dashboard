@@ -7,12 +7,12 @@ import SystemStatus from "@/components/sensors/SystemStatus";
 
 // Mock data for sensors with proper typing
 const mockSensors = [
-  { id: 1, name: "Sensor 1", location: "Área A", status: "online" as const, value: 23.5, unit: "Hz" },
-  { id: 2, name: "Sensor 2", location: "Área B", status: "warning" as const, value: 46.2, unit: "Hz" },
-  { id: 3, name: "Sensor 3", location: "Área C", status: "offline" as const, value: 0, unit: "Hz" },
-  { id: 4, name: "Sensor 4", location: "Área D", status: "online" as const, value: 18.7, unit: "Hz" },
-  { id: 5, name: "Sensor 5", location: "Área E", status: "online" as const, value: 31.4, unit: "Hz" },
-  { id: 6, name: "Sensor 6", location: "Área F", status: "online" as const, value: 27.8, unit: "Hz" },
+  { id: 1, name: "Sensor 1", location: "Área A", status: "online" as const, value: 2.3, unit: "mm/s" },
+  { id: 2, name: "Sensor 2", location: "Área B", status: "warning" as const, value: 3.2, unit: "mm/s" },
+  { id: 3, name: "Sensor 3", location: "Área C", status: "offline" as const, value: 0, unit: "mm/s" },
+  { id: 4, name: "Sensor 4", location: "Área D", status: "online" as const, value: 4.2, unit: "mm/s" },
+  { id: 5, name: "Sensor 5", location: "Área E", status: "online" as const, value: 1.2, unit: "mm/s" },
+  { id: 6, name: "Sensor 6", location: "Área F", status: "online" as const, value: 3.7, unit: "mm/s" },
 ];
 
 // Mock data for alerts with proper typing

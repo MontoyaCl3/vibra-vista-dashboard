@@ -2,6 +2,7 @@
 import { Button } from "@/components/ui/button";
 import { Menu } from "lucide-react";
 
+
 interface DashboardHeaderProps {
   title: string;
   toggleSidebar: () => void;
@@ -14,7 +15,7 @@ const DashboardHeader: React.FC<DashboardHeaderProps> = ({
   isSidebarOpen,
 }) => {
   return (
-    <header className="bg-white shadow-sm py-4 px-6 flex items-center justify-between">
+    <header className="bg-white shadow-sm py-4 px-6 flex items-center justify-between h-24">
       <div className="flex items-center">
         <Button 
           variant="ghost" 
@@ -28,7 +29,7 @@ const DashboardHeader: React.FC<DashboardHeaderProps> = ({
           <img 
             src="/lovable-uploads/51a3b95a-4eef-4ce0-94d7-ac5f812b73f9.png" 
             alt="PYMEX Logo" 
-            className="h-8 w-auto"
+            className="h-28 w-auto"
           />
           <div className="h-6 w-px bg-gray-300"></div>
           <h1 className="text-xl font-medium text-dashboard-text">{title}</h1>

@@ -47,10 +47,10 @@ const generateMockData = (dataPoints = 24) => {
     
     data.push({
       time: `${hour}:00`,
-      sensor1: Math.random() * 20 + 20, // 20-40 Hz
-      sensor2: Math.random() * 30 + 30, // 30-60 Hz
-      sensor3: Math.random() * 15 + 15, // 15-30 Hz
-      sensor4: Math.random() * 25 + 10, // 10-35 Hz
+      sensor1: Math.random() * 2 + 2, // 20-40 mm/s
+      sensor2: Math.random() * 3+ 3, // 30-60 mm/s
+      sensor3: Math.random() * 1.5 + 1.5, // 15-30 mm/s
+      sensor4: Math.random() * 2.5 + 1, // 10-35 mm/s
     });
   }
   
@@ -58,7 +58,7 @@ const generateMockData = (dataPoints = 24) => {
 };
 
 // Mock data for visualizations
-const hourlyData = generateMockData(24);
+const hourlyData = generateMockData();
 const weeklyData = generateMockData(7).map((item, index) => {
   const days = ['Dom', 'Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb'];
   return { ...item, time: days[index % 7] };
@@ -74,10 +74,10 @@ const colors = {
 
 // Pie chart data
 const pieData = [
-  { name: "0-20 Hz", value: 35 },
-  { name: "20-40 Hz", value: 45 },
-  { name: "40-60 Hz", value: 15 },
-  { name: "60+ Hz", value: 5 },
+  { name: "0-20 mm/s", value: 35 },
+  { name: "20-40 mm/s", value: 45 },
+  { name: "40-60 mm/s", value: 15 },
+  { name: "60+ mm/s", value: 5 },
 ];
 
 const COLORS = ["#0088FE", "#00C49F", "#FFBB28", "#FF8042"];
@@ -130,10 +130,10 @@ const Visualization = () => {
         <CardContent>
           <Tabs defaultValue="line">
             <TabsList>
-              <TabsTrigger value="line">Gráfico de Línea</TabsTrigger>
-              <TabsTrigger value="area">Gráfico de Área</TabsTrigger>
-              <TabsTrigger value="bar">Gráfico de Barras</TabsTrigger>
-              <TabsTrigger value="pie">Gráfico Circular</TabsTrigger>
+              <TabsTrigger value="line">Overall</TabsTrigger>
+              <TabsTrigger value="area">Eje X</TabsTrigger>
+              <TabsTrigger value="bar">Eje Y</TabsTrigger>
+              <TabsTrigger value="pie">Eje Z</TabsTrigger>
             </TabsList>
             
             <TabsContent value="line" className="pt-4">
@@ -142,7 +142,7 @@ const Visualization = () => {
                   <LineChart data={displayData} margin={{ top: 5, right: 30, left: 20, bottom: 5 }}>
                     <CartesianGrid strokeDasharray="3 3" />
                     <XAxis dataKey="time" />
-                    <YAxis label={{ value: 'Vibración (Hz)', angle: -90, position: 'insideLeft' }} />
+                    <YAxis label={{ value: 'Vibración (mm/s)', angle: -90, position: 'insideLeft' }} />
                     <Tooltip />
                     <Legend />
                     {(sensor === "all" || sensor === "sensor1") && (
@@ -189,7 +189,7 @@ const Visualization = () => {
                   <AreaChart data={displayData} margin={{ top: 5, right: 30, left: 20, bottom: 5 }}>
                     <CartesianGrid strokeDasharray="3 3" />
                     <XAxis dataKey="time" />
-                    <YAxis label={{ value: 'Vibración (Hz)', angle: -90, position: 'insideLeft' }} />
+                    <YAxis label={{ value: 'Vibración (mm/s)', angle: -90, position: 'insideLeft' }} />
                     <Tooltip />
                     <Legend />
                     {(sensor === "all" || sensor === "sensor1") && (
@@ -243,7 +243,7 @@ const Visualization = () => {
                   <BarChart data={displayData} margin={{ top: 5, right: 30, left: 20, bottom: 5 }}>
                     <CartesianGrid strokeDasharray="3 3" />
                     <XAxis dataKey="time" />
-                    <YAxis label={{ value: 'Vibración (Hz)', angle: -90, position: 'insideLeft' }} />
+                    <YAxis label={{ value: 'Vibración (mm/s)', angle: -90, position: 'insideLeft' }} />
                     <Tooltip />
                     <Legend />
                     {(sensor === "all" || sensor === "sensor1") && (
@@ -317,19 +317,19 @@ const Visualization = () => {
               <div className="grid grid-cols-2 gap-4">
                 <div className="bg-muted p-4 rounded-md">
                   <div className="text-sm text-muted-foreground">Promedio</div>
-                  <div className="text-2xl font-bold">32.5 Hz</div>
+                  <div className="text-2xl font-bold">3.2 mm/s</div>
                 </div>
                 <div className="bg-muted p-4 rounded-md">
                   <div className="text-sm text-muted-foreground">Máximo</div>
-                  <div className="text-2xl font-bold">58.7 Hz</div>
+                  <div className="text-2xl font-bold">5.8 mm/s</div>
                 </div>
                 <div className="bg-muted p-4 rounded-md">
                   <div className="text-sm text-muted-foreground">Mínimo</div>
-                  <div className="text-2xl font-bold">12.3 Hz</div>
+                  <div className="text-2xl font-bold">0.2 mm/s</div>
                 </div>
                 <div className="bg-muted p-4 rounded-md">
                   <div className="text-sm text-muted-foreground">Desviación</div>
-                  <div className="text-2xl font-bold">±4.2 Hz</div>
+                  <div className="text-2xl font-bold">±1.2 mm/s</div>
                 </div>
               </div>
             </div>
