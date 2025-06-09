@@ -5,6 +5,7 @@ import { componentTagger } from "lovable-tagger";
 
 // https://vitejs.dev/config/
 export default defineConfig(({ mode }) => ({
+  base:"https://montoyacl3.github.io/vibra-vista-dashboard/",
   plugins: [
     react(),
     mode === 'development' &&
