@@ -27,7 +27,7 @@ const App = () => {
     <TooltipProvider>
       <Toaster />
       <Sonner />
-      <BrowserRouter basename="/vibra-vista-dashboard/">
+      <BrowserRouter>
         <Routes>
           <Route 
             path="/" 
