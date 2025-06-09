@@ -1,5 +1,5 @@
 {
-  "name": "vite_react_shadcn_ts",
+  "name": "Pymex",
   "private": true,
   "version": "0.0.0",
   "type": "module",
@@ -46,6 +46,7 @@
     "cmdk": "^1.0.0",
     "date-fns": "^3.6.0",
     "embla-carousel-react": "^8.3.0",
+    "gh-pages": "^6.3.0",
     "input-otp": "^1.2.4",
     "lucide-react": "^0.462.0",
     "mqtt": "^5.13.0",
