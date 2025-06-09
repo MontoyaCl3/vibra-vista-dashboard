@@ -25,12 +25,10 @@ import { Settings, Edit, Trash2, PlusCircle } from "lucide-react";
 
 // Mock data for sensors
 const initialSensors = [
-  { id: 1, name: "Sensor 1", location: "Área A", macAddress: "AA:BB:CC:DD:EE:01", threshold: 6.2, interval: 5 },
-  { id: 2, name: "Sensor 2", location: "Área B", macAddress: "AA:BB:CC:DD:EE:02", threshold: 6.2, interval: 10 },
-  { id: 3, name: "Sensor 3", location: "Área C", macAddress: "AA:BB:CC:DD:EE:03", threshold: 6.2, interval: 5 },
-  { id: 4, name: "Sensor 4", location: "Área D", macAddress: "AA:BB:CC:DD:EE:04", threshold: 6.2, interval: 15 },
-  { id: 5, name: "Sensor 5", location: "Área E", macAddress: "AA:BB:CC:DD:EE:05", threshold: 6.2, interval: 10 },
-  { id: 6, name: "Sensor 6", location: "Área F", macAddress: "AA:BB:CC:DD:EE:06", threshold: 6.2, interval: 5 },
+  { id: 1, name: "Sensor WS300", location: "Motor LL", macAddress: "AA:BB:CC:DD:EE:01", threshold: 6.2, interval: 5 },
+  { id: 2, name: "Sensor WS200", location: "Motor LL", macAddress: "AA:BB:CC:DD:EE:02", threshold: 6.2, interval: 10 },
+  { id: 3, name: "Sensor 3", location: "Spare", macAddress: "AA:BB:CC:DD:EE:03", threshold: 6.2, interval: 5 },
+  { id: 4, name: "Sensor 4", location: "Spare", macAddress: "AA:BB:CC:DD:EE:04", threshold: 6.2, interval: 15 },
 ];
 
 const Configuration = () => {

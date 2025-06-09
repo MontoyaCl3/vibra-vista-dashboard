@@ -4,15 +4,14 @@ import { Activity, AlertTriangle, CheckCircle, Gauge } from "lucide-react";
 import SensorStatusCard from "@/components/sensors/SensorStatusCard";
 import RecentAlerts from "@/components/sensors/RecentAlerts";
 import SystemStatus from "@/components/sensors/SystemStatus";
+import { useSupabaseReadings } from "@/hooks/useSupabaseReadings";
 
 // Mock data for sensors with proper typing
 const mockSensors = [
-  { id: 1, name: "Sensor 1", location: "Área A", status: "online" as const, value: 2.3, unit: "mm/s" },
-  { id: 2, name: "Sensor 2", location: "Área B", status: "warning" as const, value: 3.2, unit: "mm/s" },
-  { id: 3, name: "Sensor 3", location: "Área C", status: "offline" as const, value: 0, unit: "mm/s" },
-  { id: 4, name: "Sensor 4", location: "Área D", status: "online" as const, value: 4.2, unit: "mm/s" },
-  { id: 5, name: "Sensor 5", location: "Área E", status: "online" as const, value: 1.2, unit: "mm/s" },
-  { id: 6, name: "Sensor 6", location: "Área F", status: "online" as const, value: 3.7, unit: "mm/s" },
+  { id: 1, name: "WS300", location: "Área A", status: "online" as const, value: 2.3, unit: "mm/s" },
+  { id: 2, name: "WS100", location: "Área B", status: "online" as const, value: 3.2, unit: "mm/s" },
+  { id: 3, name: "Sensor 3", location: "TBD", status: "offline" as const, value: 0, unit: "mm/s" },
+  { id: 4, name: "Sensor 4", location: "TBD", status: "offline" as const, value: 4.2, unit: "mm/s" },
 ];
 
 // Mock data for alerts with proper typing
@@ -27,7 +26,9 @@ const Dashboard = () => {
   const onlineSensors = mockSensors.filter(sensor => sensor.status === "online").length;
   const warningSensors = mockSensors.filter(sensor => sensor.status === "warning").length;
   const offlineSensors = mockSensors.filter(sensor => sensor.status === "offline").length;
+  const { readings, loading, error } = useSupabaseReadings();
 
+  const maxZrms = Math.max(...readings.map(item => item.Zrms));
   return (
     <div className="space-y-6">
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">

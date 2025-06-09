@@ -14,6 +14,8 @@ const CreateGraph = (props) => {
   if (loading) return <p>Cargando datos...</p>;
   if (error) return <p>Error: {error}</p>;
 
+  const key = props.eje.concat(props.peakOrRms)
+
   return (
     <ResponsiveContainer width="100%" height="100%">
       <LineChart data={readings} margin={{ top: 5, right: 30, left: 20, bottom: 5 }}>
@@ -23,13 +25,13 @@ const CreateGraph = (props) => {
         <Tooltip />
         <Legend />
         {(props.sensor === "all" || props.sensor === "sensor1") && (
-          <Line type="monotone" dataKey="Xpk" name="Sensor 1" stroke={colors.sensor1} activeDot={{ r: 8 }} />
+          <Line type="monotone" dataKey={key} name="Sensor 1" stroke={colors.sensor1} activeDot={{ r: 8 }} />
         )}
         {(props.sensor === "all" || props.sensor === "sensor2") && (
-          <Line type="monotone" dataKey="Ypk" name="Sensor 2" stroke={colors.sensor2} />
+          <Line type="monotone" dataKey={key} name="Sensor 2" stroke={colors.sensor2} />
         )}
         {(props.sensor === "all" || props.sensor === "sensor3") && (
-          <Line type="monotone" dataKey="Zpk" name="Sensor 3" stroke={colors.sensor3} />
+          <Line type="monotone" dataKey={key} name="Sensor 3" stroke={colors.sensor3} />
         )}
         {/* Si quieres agregar más sensores, ajusta aquí */}
       </LineChart>
