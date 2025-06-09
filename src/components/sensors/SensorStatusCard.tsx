@@ -2,6 +2,7 @@
 import { cn } from "@/lib/utils";
 import { Card, CardContent } from "@/components/ui/card";
 import { AlertTriangle, CheckCircle, AlertCircle } from "lucide-react";
+import { useSupabaseReadings } from "@/hooks/useSupabaseReadings";
 
 interface SensorProps {
   sensor: {
@@ -15,6 +16,10 @@ interface SensorProps {
 }
 
 const SensorStatusCard = ({ sensor }: SensorProps) => {
+  const { readings, loading, error } = useSupabaseReadings();
+  if(readings[readings.length-1].Zrms !== undefined ){
+  const valor = readings[readings.length-1].Zrms
+  }
   const getStatusInfo = (status: string) => {
     switch (status) {
       case "online":

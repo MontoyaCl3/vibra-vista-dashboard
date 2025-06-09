@@ -97,10 +97,7 @@ const Visualization = () => {
                 <SelectValue placeholder="Seleccionar sensor" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="all" >Todos sensores</SelectItem>
-                <SelectItem value="sensor1">Sensor 1</SelectItem>
-                <SelectItem value="sensor2">Sensor 2</SelectItem>
-                <SelectItem value="sensor3">Sensor 3</SelectItem>
+                <SelectItem value="all" >Sensor 1</SelectItem>
               </SelectContent>
             </Select>
             
