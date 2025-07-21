@@ -91,6 +91,6 @@
   }
 
   body {
-    @apply bg-dashboard-background text-dashboard-text;
+    @apply bg-background text-foreground;
   }
 }

@@ -29,7 +29,7 @@ const Dashboard = () => {
   ];
   // Count sensors by status
   const onlineSensors = mockSensors.filter(sensor => sensor.status === "online").length;
-  const warningSensors = mockSensors.filter(sensor => sensor.status === "warning").length;
+  const warningSensors = 0; // No warning sensors in mock data yet
   const offlineSensors = mockSensors.filter(sensor => sensor.status === "offline").length;
   
 
