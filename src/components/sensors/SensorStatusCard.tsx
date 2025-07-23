@@ -17,12 +17,12 @@ interface SensorProps {
 
 const SensorStatusCard = ({ sensor }: SensorProps) => {
   const { readings, loading, error } = useSupabaseReadings();
-  if(readings[readings.length-1].Zrms !== undefined ){
-  const valor = readings[readings.length-1].Zrms
-  }
+  const valor = readings.length > 0 ? readings[readings.length - 1].Zrms : undefined;
   const getStatusInfo = (status: string) => {
     switch (status) {
       case "online":
+
+        
         return {
           icon: <CheckCircle className="h-5 w-5 text-dashboard-success" />,
           label: "En línea",
@@ -77,7 +77,7 @@ const SensorStatusCard = ({ sensor }: SensorProps) => {
           
           {sensor.status !== "offline" && (
             <div className="text-right">
-              <div className="text-2xl font-bold">{sensor.value}</div>
+              <div className="text-2xl font-bold">{valor}</div>
               <div className="text-sm">{sensor.unit}</div>
             </div>
           )}
