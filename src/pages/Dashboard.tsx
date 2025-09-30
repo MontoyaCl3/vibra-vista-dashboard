@@ -1,22 +1,67 @@
 
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Activity, AlertTriangle, CheckCircle, Gauge } from "lucide-react";
+import { Activity, AlertTriangle, CheckCircle, Gauge, Sidebar } from "lucide-react";
 import SensorStatusCard from "@/components/sensors/SensorStatusCard";
 import RecentAlerts from "@/components/sensors/RecentAlerts";
 import SystemStatus from "@/components/sensors/SystemStatus";
 import { useSupabaseReadings } from "@/hooks/useSupabaseReadings";
+import DashboardSidebarGroup from "../components/layout/DashboardSidebarGroup";
 
 // Mock data for sensors with proper typing
-
-
-// Mock data for alerts with proper typing
 const mockAlerts = [
   { id: 1, sensorId: 2, message: "Vibración excesiva detectada", severity: "warning" as const, time: "Hace 30 min" },
   { id: 2, sensorId: 3, message: "Pérdida de conexión", severity: "error" as const, time: "Hace 2 horas" },
   { id: 3, sensorId: 2, message: "Umbral de vibración superado", severity: "warning" as const, time: "Hace 1 día" },
 ];
 
+// Mock data for alerts with proper typing
+const DataCard = () =>{
+        return(
+        <div className="bg-slate-700 rounded-lg p-4 text-white">
+          <h1>Sensor ---</h1>
+          <br/>
+          <p>
+            Xrms: ---
+            <br/>
+            Yrms: ---
+            <br/>
+            Zrms: ---
+            <br/>
+            Bateria: ---
+            <br/>
+            Tiempo de lectura: ---
+          </p>
+        </div>
+        
+        )
+}
+
+
 const Dashboard = () => {
+  return(
+    <section className="p-0">
+    < DashboardSidebarGroup/>
+    <main className="bg-white w-full h-full shadow-lg rounded-md p-4 flex  gap-5">
+      <section>
+        
+      </section>
+      <section className="flex flex-row gap-3 h-72 w-2/3 justify-center bg-slate-300 p-6 rounded-xl">
+        <DataCard/>
+          <div className="w-60 h-60 bg-cover bg-[url('public/engine-motor.svg')]"></div>
+        <DataCard/>
+      </section>
+          <div className="w-1/3 space-y-6">
+          <RecentAlerts alerts={mockAlerts} />
+        </div>
+    </main>
+  </section>
+  )
+}
+
+
+
+
+const standby = () => {
 
   const { readings, loading, error } = useSupabaseReadings();
   const maxZrms = Math.max(...readings.map(item => item.Zrms));

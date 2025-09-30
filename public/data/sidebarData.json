@@ -1,0 +1,38 @@
+
+[
+  {
+    "id": 1,
+    "name": "Área de Producción",
+    "machines": [
+      {
+        "id": 11,
+        "name": "Compresor A",
+        "sensors": [
+          "Sensor Vibración 1",
+          "Sensor Temperatura 2"
+        ]
+      },
+      {
+        "id": 12,
+        "name": "Bomba B",
+        "sensors": [
+          "Sensor Vibración 3",
+          "Sensor Presión 4"
+        ]
+      }
+    ]
+  },
+  {
+    "id": 2,
+    "name": "Área de Ensamblaje",
+    "machines": [
+      {
+        "id": 21,
+        "name": "Motor C",
+        "sensors": [
+          "Sensor Vibración 5"
+        ]
+      }
+    ]
+  }
+]

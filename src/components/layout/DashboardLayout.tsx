@@ -26,7 +26,7 @@ const DashboardLayout: React.FC<DashboardLayoutProps> = ({ children }) => {
 
   return (
     <div className="min-h-screen flex bg-dashboard-background">
-      <DashboardSidebar isOpen={sidebarOpen} />
+      <DashboardSidebar isOpen={sidebarOpen}  toggleSidebar={toggleSidebar}/>
       
       <div className={`flex-1 flex flex-col transition-all duration-300 ${sidebarOpen ? 'ml-64' : 'ml-16'}`}>
         <DashboardHeader 
@@ -34,7 +34,7 @@ const DashboardLayout: React.FC<DashboardLayoutProps> = ({ children }) => {
           toggleSidebar={toggleSidebar} 
           isSidebarOpen={sidebarOpen}
         />
-        <main className="flex-1 p-6">
+        <main className="flex-1 p-0">
           {children}
         </main>
       </div>

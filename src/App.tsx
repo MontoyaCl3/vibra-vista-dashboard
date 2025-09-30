@@ -3,9 +3,10 @@ import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { BrowserRouter, Routes, Route, HashRouter  } from "react-router-dom";
 import DashboardLayout from "./components/layout/DashboardLayout";
 import Dashboard from "./pages/Dashboard";
+import AlarmPanel from "./pages/AlarmPanel"
 import Configuration from "./pages/Configuration";
 import Visualization from "./pages/Visualization";
 import NotFound from "./pages/NotFound";
@@ -14,8 +15,11 @@ import { createClient } from "@supabase/supabase-js";
 
 
 const queryClient = new QueryClient();
-const supabase = createClient(import.meta.env.VITE_SUPABASE_URL, import.meta.env.VITE_SUPABASE_ANON_KEY);
 
+const SUPABASE_URL = "https://hnncwhncrdyeplgswytf.supabase.co";
+const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImhubmN3aG5jcmR5ZXBsZ3N3eXRmIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDgzNzA3NTMsImV4cCI6MjA2Mzk0Njc1M30.F2H4FKlCZRZIhK9Jakqwp4IDx4wwxUSr4q6Y3lFEsgA";
+
+const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
 
 const App = () => {
@@ -27,7 +31,8 @@ const App = () => {
     <TooltipProvider>
       <Toaster />
       <Sonner />
-      <BrowserRouter>
+      <HashRouter >
+        
         <Routes>
           <Route 
             path="/" 
@@ -46,6 +51,14 @@ const App = () => {
             } 
           />
           <Route 
+            path="/alarm" 
+            element={
+              <DashboardLayout>
+                <AlarmPanel />
+              </DashboardLayout>
+            } 
+          />
+          <Route 
             path="/visualization" 
             element={
               <DashboardLayout>
@@ -55,7 +68,7 @@ const App = () => {
           />
           <Route path="*" element={<NotFound />} />
         </Routes>
-      </BrowserRouter>
+      </HashRouter >
     </TooltipProvider>
   </QueryClientProvider>
   )

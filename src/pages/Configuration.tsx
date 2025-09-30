@@ -173,7 +173,7 @@ const Configuration = () => {
                   <TableRow>
                     <TableHead>Nombre</TableHead>
                     <TableHead>Ubicación</TableHead>
-                    <TableHead>Dirección MAC</TableHead>
+                    <TableHead>Numero serial</TableHead>
                     <TableHead>Umbral (Hz)</TableHead>
                     <TableHead>Intervalo</TableHead>
                     <TableHead className="text-right">Acciones</TableHead>
