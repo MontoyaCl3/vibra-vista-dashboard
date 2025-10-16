@@ -38,24 +38,22 @@ const DataCard = () =>{
 
 
 const Dashboard = () => {
-  return(
-    <section className="p-0">
-    < DashboardSidebarGroup/>
-    <main className="bg-white w-full h-full shadow-lg rounded-md p-4 flex  gap-5">
-      <section>
-        
-      </section>
+  return (
+    <main className="flex-1 bg-white shadow-lg rounded-md p-4 flex gap-5">
+      <section></section>
+
       <section className="flex flex-row gap-3 h-72 w-2/3 justify-center bg-slate-300 p-6 rounded-xl">
-        <DataCard/>
-          <div className="w-60 h-60 bg-cover bg-[url('public/engine-motor.svg')]"></div>
-        <DataCard/>
+        <DataCard />
+        <div className="w-60 h-60 bg-cover bg-[url('/engine-motor.svg')]"></div>
+        <DataCard />
       </section>
-          <div className="w-1/3 space-y-6">
-          <RecentAlerts alerts={mockAlerts} />
-        </div>
+
+      <div className="w-1/3 space-y-6">
+        <RecentAlerts alerts={mockAlerts} />
+      </div>
     </main>
-  </section>
-  )
+);
+
 }
 
 

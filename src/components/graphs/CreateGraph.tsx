@@ -1,33 +1,225 @@
-import React from "react";
-import { ResponsiveContainer, LineChart, Line, CartesianGrid, XAxis, YAxis, Tooltip, Legend } from "recharts";
+import React, { useState } from "react";
+import Plot from "react-plotly.js";
+import FFT from "fft.js";
 
-const CreateGraph = ({ Z, X, Y,Fs = null, Samples = null }) => {
-  
-  // Resolucion de la frecuencia para la FTT
-  const df = (Fs && Samples) ? Fs / Samples : null;
+const CreateGraph = ({
+  data, Samples, Fs
+}) => {
+  const [tab, setTab] = useState("ACELERACION");
+  const [axis, setAxis] = useState("Z");
+  const df = Fs/Samples
+  console.log(df)
+  // Calcula velocidad por integración
+  function integrar(aceleracion, dt) {
+    const velocidad = [];
+    let suma = 0;
+    for (let i = 0; i < aceleracion.length; i++) {
+      if (i === 0) {
+        suma = 0;
+      } else {
+        suma += (((aceleracion[i] + aceleracion[i - 1])) / 2) * dt;
+      }
+      velocidad.push(suma * 9.8);
+    }
+    return velocidad;
+  }
 
-  //Formatea la entrada para Rechart
-  const chartData = Z.map((zValue, index) => ({
-    name: df ? (index + 1) * df : index + 1, // Si df existe usa frecuencia, si no índice
-    zValue: zValue,
-    xValue: X?.[index],
-    yValue: Y?.[index]
-  }));
+  // Calcula FFT
+  function nextPowerOfTwo(n) {
+    return Math.pow(2, Math.ceil(Math.log2(n)));
+  }
+  function computeFFT(arr) {
+    if (!arr || arr.length === 0) return [];
+    const N = nextPowerOfTwo(arr.length);
+    const fft = new FFT(N);
+    const input = new Array(N).fill(0);
+    const output = new Array(N).fill(0);
+    for (let i = 0; i < arr.length; i++) input[i] = arr[i];
+    fft.realTransform(output, input);
+    fft.completeSpectrum(output);
+    const mag = [];
+    for (let i = 0; i < N / 2; i++) {
+      const re = output[2 * i];
+      const im = output[2 * i + 1];
+      mag.push(Math.sqrt(re * re + im * im));
+    }
+    return mag;
+  }
 
-  //Dibuja la grafica
+  // Obtiene los datos para graficar según pestaña y eje
+  const getChartData = () => {
+    let values;
+    let title = "";
+    let yLabel = "";
+    if (tab === "ACELERACION") {
+      if (axis === "Todos") {
+        return {
+          series: [
+            { axis: "X", values: data.X },
+            { axis: "Y", values: data.Y },
+            { axis: "Z", values: data.Z },
+          ],
+          title: `Aceleración (Todos los ejes)`,
+          yLabel: "Aceleración (m/s²)",
+        };
+      }
+      values = data[axis];
+      title = `Aceleración (${axis})`;
+      yLabel = "Aceleración (m/s²)";
+    } else if (tab === "VELOCIDAD") {
+      if (axis === "Todos") {
+        return {
+          series: [
+            { axis: "X", values: integrar(data.X, 1 / data.Fs) },
+            { axis: "Y", values: integrar(data.Y, 1 / data.Fs) },
+            { axis: "Z", values: integrar(data.Z, 1 / data.Fs) },
+          ],
+          title: `Velocidad (Todos los ejes)`,
+          yLabel: "Velocidad (m/s)",
+        };
+      }
+      values = integrar(data[axis], 1 / data.Fs);
+      title = `Velocidad (${axis})`;
+      yLabel = "Velocidad (m/s)";
+    } else if (tab === "FFT") {
+      if (axis === "Todos") {
+        return {
+          series: [
+            { axis: "X", values: computeFFT(data.X) },
+            { axis: "Y", values: computeFFT(data.Y) },
+            { axis: "Z", values: computeFFT(data.Z) },
+          ],
+          title: `FFT (Todos los ejes)`,
+          yLabel: "Magnitud FFT",
+        };
+      }
+      values = computeFFT(data[axis]);
+      title = `FFT (${axis})`;
+      yLabel = "Magnitud FFT";
+    }
+    return { values, title, yLabel };
+  };
+
+  const chartData = getChartData();
+  const x =
+    tab === "FFT"
+      ? axis === "Todos"
+        ? chartData.series[0].values.map((_, idx) => idx * df)
+        : chartData.values.map((_, idx) => (idx+1) * df)
+      : axis === "Todos"
+      ? chartData.series[0].values.map((_, idx) => idx + 1)
+      : chartData.values.map((_, idx) => idx + 1);
+
   return (
-    <ResponsiveContainer width="100%" height={300}>
-      <LineChart data={chartData}>
-        <CartesianGrid stroke="#eee" strokeDasharray="5 5" />
-        <XAxis dataKey="name" />
-        <YAxis />
-        <Tooltip />
-        <Legend />
-        <Line type="monotone" dataKey="zValue" stroke="#8884d8" name="Eje Z" dot={false}/>
-        <Line type="monotone" dataKey="xValue" stroke="#82ca9d" name="Eje X" dot={false}/>
-        <Line type="monotone" dataKey="yValue" stroke="#ff7300" name="Eje Y" dot={false}/>
-      </LineChart>
-    </ResponsiveContainer>
+    <div className="w-full h-[400px] mx-auto bg-white shadow-lg rounded-xl border">
+      {/* Tabs */}
+      <div className="flex items-center gap-4 px-4 pt-3 border-b">
+        <button
+          onClick={() => setTab("ACELERACION")}
+          className={`pb-2 font-medium ${
+            tab === "ACELERACION"
+              ? "border-b-2 border-blue-500 text-blue-600"
+              : "text-gray-500"
+          }`}
+        >
+          ACELERACION
+        </button>
+        <button
+          onClick={() => setTab("VELOCIDAD")}
+          className={`pb-2 font-medium ${
+            tab === "VELOCIDAD"
+              ? "border-b-2 border-blue-500 text-blue-600"
+              : "text-gray-500"
+          }`}
+        >
+          VELOCIDAD
+        </button>
+        <button
+          onClick={() => setTab("FFT")}
+          className={`pb-2 font-medium ${
+            tab === "FFT"
+              ? "border-b-2 border-blue-500 text-blue-600"
+              : "text-gray-500"
+          }`}
+        >
+          FFT
+        </button>
+        {/* Dropdown para elegir el eje */}
+        <div className="ml-auto">
+          <select
+            value={axis}
+            onChange={e => setAxis(e.target.value)}
+            className="border rounded px-2 py-1 text-gray-700 bg-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+          >
+            <option value="X">Eje X</option>
+            <option value="Y">Eje Y</option>
+            <option value="Z">Eje Z</option>
+            <option value="Todos">Todos</option>
+          </select>
+        </div>
+      </div>
+      {/* Plot */}
+      <div className="p-4">
+        <Plot
+          data={
+            axis === "Todos"
+              ? [
+                  {
+                    x: x,
+                    y: chartData.series[0].values,
+                    type: "scatter",
+                    mode: "lines+markers",
+                    name: "X",
+                    marker: { size: 8 },
+                    line: { width: 2 },
+                  },
+                  {
+                    x: x,
+                    y: chartData.series[1].values,
+                    type: "scatter",
+                    mode: "lines+markers",
+                    name: "Y",
+                    marker: { size: 8 },
+                    line: { width: 2 },
+                  },
+                  {
+                    x: x,
+                    y: chartData.series[2].values,
+                    type: "scatter",
+                    mode: "lines+markers",
+                    name: "Z",
+                    marker: { size: 8 },
+                    line: { width: 2 },
+                  },
+                ]
+              : [
+                  {
+                    x: x,
+                    y: chartData.values,
+                    type: "scatter",
+                    mode: "lines+markers",
+                    name: axis,
+                    marker: { size: 8 },
+                    line: { width: 2 },
+                  },
+                ]
+          }
+          layout={{
+            title: { text: chartData.title, font: { size: 18 } },
+            xaxis: { title: "Número de muestra" },
+            yaxis: { title: chartData.yLabel },
+            autosize: true,
+            margin: { l: 60, r: 30, b: 50, t: 50 },
+          }}
+          config={{
+            responsive: true,
+            scrollZoom: true,
+            displayModeBar: true,
+          }}
+          style={{ width: "100%", height: "300px" }}
+        />
+      </div>
+    </div>
   );
 };
 

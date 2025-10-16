@@ -2,14 +2,14 @@
 [
   {
     "id": 1,
-    "name": "Área de Producción",
+    "name": "Central de Bombeo 1",
     "machines": [
       {
         "id": 11,
-        "name": "Compresor A",
+        "name": "Bomba A",
         "sensors": [
           "Sensor Vibración 1",
-          "Sensor Temperatura 2"
+          "Sensor Vibración 2"
         ]
       },
       {
@@ -17,18 +17,18 @@
         "name": "Bomba B",
         "sensors": [
           "Sensor Vibración 3",
-          "Sensor Presión 4"
+          "Sensor Vibración 4"
         ]
       }
     ]
   },
   {
     "id": 2,
-    "name": "Área de Ensamblaje",
+    "name": "Central de Bombeo 2",
     "machines": [
       {
         "id": 21,
-        "name": "Motor C",
+        "name": "Bomba C",
         "sensors": [
           "Sensor Vibración 5"
         ]
