@@ -101,6 +101,23 @@ const CreateGraph = ({
   };
 
   const chartData = getChartData();
+
+  // Decide comportamiento gráfico según cantidad de puntos
+  const pointCount =
+    tab === "FFT"
+      ? axis === "Todos"
+        ? (chartData.series?.[0]?.values?.length || 0)
+        : (chartData.values?.length || 0)
+      : axis === "Todos"
+      ? (chartData.series?.[0]?.values?.length || 0)
+      : (chartData.values?.length || 0);
+
+  // Si hay muchos puntos, no mostrar markers y hacer la línea más delgada
+  const showMarkers = pointCount <= 500;
+  const markerSize = showMarkers ? 5 : 1.5;
+  const lineWidth = pointCount > 4000 ? 0.6 : pointCount > 2000 ? 1 : 1.6;
+  const plotMode = showMarkers ? "lines+markers" : "lines";
+
   const x =
     tab === "FFT"
       ? axis === "Todos"
@@ -168,28 +185,28 @@ const CreateGraph = ({
                     x: x,
                     y: chartData.series[0].values,
                     type: "scatter",
-                    mode: "lines+markers",
+                    mode: plotMode,
                     name: "X",
-                    marker: { size: 8 },
-                    line: { width: 2 },
+                    marker: { size: markerSize, opacity: 0.7 },
+                    line: { width: lineWidth },
                   },
                   {
                     x: x,
                     y: chartData.series[1].values,
                     type: "scatter",
-                    mode: "lines+markers",
+                    mode: plotMode,
                     name: "Y",
-                    marker: { size: 8 },
-                    line: { width: 2 },
+                    marker: { size: markerSize, opacity: 0.7 },
+                    line: { width: lineWidth },
                   },
                   {
                     x: x,
                     y: chartData.series[2].values,
                     type: "scatter",
-                    mode: "lines+markers",
+                    mode: plotMode,
                     name: "Z",
-                    marker: { size: 8 },
-                    line: { width: 2 },
+                    marker: { size: markerSize, opacity: 0.7 },
+                    line: { width: lineWidth },
                   },
                 ]
               : [
@@ -197,17 +214,29 @@ const CreateGraph = ({
                     x: x,
                     y: chartData.values,
                     type: "scatter",
-                    mode: "lines+markers",
+                    mode: plotMode,
                     name: axis,
-                    marker: { size: 8 },
-                    line: { width: 2 },
+                    marker: { size: markerSize, opacity: 0.8 },
+                    line: { width: lineWidth },
                   },
                 ]
           }
           layout={{
             title: { text: chartData.title, font: { size: 18 } },
-            xaxis: { title: "Número de muestra" },
-            yaxis: { title: chartData.yLabel },
+            xaxis: {
+              title: tab === "FFT" ? "Frecuencia (Hz)" : "Número de muestra",
+              type: tab === "FFT" ? "linear" : "linear",
+            },
+            yaxis: {
+              title: {
+                text:
+                  tab === "ACELERACION"
+                    ? `${chartData.yLabel} (G)`
+                    : tab === "VELOCIDAD"
+                    ? `${chartData.yLabel}`
+                    : chartData.yLabel,
+              },
+            },
             autosize: true,
             margin: { l: 60, r: 30, b: 50, t: 50 },
           }}

@@ -29,20 +29,48 @@ const InteractiveChartTabs = ({
           { axis: "Z", values: data.map(item => item[axisMap.Z[key]]) },
         ],
         title: `Aceleración ${activeTab} (Todos los ejes)`,
-        yLabel: "Aceleración (m/s²)",
+        yLabel: "Amplitud",
       };
     }
     const axisKeys = axisMap[axis];
     return {
       y: data.map(item => item[axisKeys[key]]),
       title: `Aceleración ${activeTab} (${axis})`,
-      yLabel: "Aceleración (m/s²)",
+      yLabel: "Amplitud",
     };
   };
 
   const { y, title, yLabel } = getChartData();
-  const x = Array.isArray(y) && y[0]?.values ? y[0].values.map((_, idx) => idx + 1) : y.map((_, idx) => idx + 1);
+  // usar timestamps como eje x (fallback a índice si no hay timestamp)
+  const x = data.map(item => item.Timestamp ?? item.Time ?? null);
+  // si todos x son null, usar índices
+  const allNull = x.every(v => v === null);
+  const xFinal = allNull ? x.map((_, idx) => idx + 1) : x;
 
+  // Ordenar por fecha cuando haya timestamps válidos para evitar saltos en la línea
+  let xSorted = xFinal;
+  let ySorted = y;
+  if (!allNull) {
+    // construir array de índices ordenados por fecha (null => +Infinity)
+    const idxs = x.map((val, i) => {
+      const t = val ? Date.parse(val) : Infinity;
+      return { i, t };
+    }).sort((a, b) => a.t - b.t).map(o => o.i);
+
+    xSorted = idxs.map(i => xFinal[i]);
+
+    if (axis === "Todos") {
+      // y es [{axis: 'X', values: [...]}, ...]
+      ySorted = y.map(series => ({
+        axis: series.axis,
+        values: idxs.map(i => series.values[i]),
+      }));
+    } else {
+      // y es array simple paralelo a x
+      ySorted = idxs.map(i => y[i]);
+    }
+  }
+  
   return (
     <div className="w-full h-[400px] mx-auto bg-white shadow-lg rounded-xl border">
       {/* Tabs */}
@@ -99,48 +127,49 @@ const InteractiveChartTabs = ({
             axis === "Todos"
               ? [
                   {
-                    x: x,
-                    y: y[0].values,
+                    x: xSorted,
+                    y: ySorted[0].values,
                     type: "scatter",
                     mode: "lines+markers",
                     name: "X",
-                    marker: { size: 8 },
-                    line: { width: 2 },
+                    marker: { size: 6 },
+                    line: { width: 1.2 },
                   },
                   {
-                    x: x,
-                    y: y[1].values,
+                    x: xSorted,
+                    y: ySorted[1].values,
                     type: "scatter",
                     mode: "lines+markers",
                     name: "Y",
-                    marker: { size: 8 },
-                    line: { width: 2 },
+                    marker: { size: 6 },
+                    line: { width: 1.2 },
                   },
                   {
-                    x: x,
-                    y: y[2].values,
+                    x: xSorted,
+                    y: ySorted[2].values,
                     type: "scatter",
                     mode: "lines+markers",
                     name: "Z",
-                    marker: { size: 8 },
-                    line: { width: 2 },
+                    marker: { size: 6 },
+                    line: { width: 1.2 },
                   },
                 ]
               : [
                   {
-                    x: x,
-                    y: y,
+                    x: xSorted,
+                    y: ySorted,
                     type: "scatter",
                     mode: "lines+markers",
-                    marker: { size: 8 },
-                    line: { width: 2 },
+                    marker: { size: 6 },
+                    line: { width: 1.2 },
                   },
                 ]
           }
           layout={{
             title: { text: title, font: { size: 18 } },
-            xaxis: { title: "Número de muestra" },
-            yaxis: { title: yLabel },
+            xaxis: { title: "Tiempo", type: allNull ? "linear" : "date" },
+            // Mostrar unidad G para indicar que los valores son en gravedades
+            yaxis: { title: { text: `${yLabel} (G)` } },
             autosize: true,
             margin: { l: 60, r: 30, b: 50, t: 50 },
           }}

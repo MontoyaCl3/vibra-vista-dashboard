@@ -5,7 +5,7 @@ import SensorStatusCard from "@/components/sensors/SensorStatusCard";
 import RecentAlerts from "@/components/sensors/RecentAlerts";
 import SystemStatus from "@/components/sensors/SystemStatus";
 import { useSupabaseReadings } from "@/hooks/useSupabaseReadings";
-import DashboardSidebarGroup from "../components/layout/DashboardSidebarGroup";
+
 
 // Mock data for sensors with proper typing
 const mockAlerts = [

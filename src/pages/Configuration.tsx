@@ -1,5 +1,4 @@
-
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { 
   Card, 
   CardContent, 
@@ -22,58 +21,199 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Settings, Edit, Trash2, PlusCircle } from "lucide-react";
+import AlarmPanel from "../components/configPanel/AlarmPanel";
+import MachineLocationPanel from "../components/configPanel/MachineLocationPanel";
 
-// Mock data for sensors
-const initialSensors = [
-  { id: 1, name: "Sensor WS300", location: "Motor LL", macAddress: "AA:BB:CC:DD:EE:01", threshold: 6.2, interval: 5 },
-  { id: 2, name: "Sensor WS200", location: "Motor LL", macAddress: "AA:BB:CC:DD:EE:02", threshold: 6.2, interval: 10 },
-  { id: 3, name: "Sensor 3", location: "Spare", macAddress: "AA:BB:CC:DD:EE:03", threshold: 6.2, interval: 5 },
-  { id: 4, name: "Sensor 4", location: "Spare", macAddress: "AA:BB:CC:DD:EE:04", threshold: 6.2, interval: 15 },
-];
+type Sensor = {
+  Name: string;
+  Serial: string;
+  Location: string;
+  Range: number;
+};
+
+type Machine = {
+  Name: string;
+  Location: string;
+};
+
+type Location = {
+  Name: string;
+};
+
+interface Alarm {
+  Name: string | null;
+  Serial_sensor: string;
+  Type: number;
+  Message: string;
+  ID: number;
+  Value?: number; // Added Value field
+}
 
 const Configuration = () => {
-  const [sensors, setSensors] = useState(initialSensors);
+  const [sensors, setSensors] = useState<Sensor[]>([]);
+  const [machines, setMachines] = useState<Machine[]>([]);
+  const [locations, setLocations] = useState<Location[]>([]);
+  const [selectedLocation, setSelectedLocation] = useState("all");
+  const [selectedMachine, setSelectedMachine] = useState("");
+  const [addSensorSelectedLocation, setAddSensorSelectedLocation] = useState<string | null>(null);
+
   const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
-  const [currentSensor, setCurrentSensor] = useState<any>(null);
-  const [newSensor, setNewSensor] = useState({
-    name: "",
-    location: "",
-    macAddress: "",
-    threshold: 50,
-    interval: 5
+  const [currentSensor, setCurrentSensor] = useState<Sensor | null>(null);
+  const [newSensor, setNewSensor] = useState<Sensor>({
+    Name: "",
+    Serial: "",
+    Location: "",
+    Range: 0
   });
 
-  const handleAddSensor = () => {
-    const id = sensors.length > 0 ? Math.max(...sensors.map(s => s.id)) + 1 : 1;
-    setSensors([...sensors, { id, ...newSensor }]);
-    setNewSensor({
-      name: "",
-      location: "",
-      macAddress: "",
-      threshold: 50,
-      interval: 5
-    });
-    setIsAddDialogOpen(false);
-  };
+  const [newAlarm, setNewAlarm] = useState<Partial<Alarm>>({
+    Name: "",
+    Serial_sensor: "",
+    Type: 1,
+    Message: "",
+    Value: 0, // Initialize Value
+  });
+  const [isAddAlarmDialogOpen, setIsAddAlarmDialogOpen] = useState(false);
 
-  const handleEditSensor = () => {
-    if (currentSensor) {
-      setSensors(sensors.map(sensor => 
-        sensor.id === currentSensor.id ? currentSensor : sensor
-      ));
-      setIsEditDialogOpen(false);
+  const API_BASE = "http://localhost:8080/api/sensors";
+  const API_MACHINES_BASE = "http://localhost:8080/api/machines";
+  const API_LOCATIONS_BASE = "http://localhost:8080/api/locations";
+
+  const fetchSensors = async () => {
+    try {
+      const res = await fetch(`${API_BASE}/`);
+      if (!res.ok) throw new Error(`Fetch error: ${res.status}`);
+      const data: Sensor[] = await res.json();
+      setSensors(data);
+    } catch (err) {
+      console.error("Error loading sensors:", err);
     }
   };
 
-  const handleDeleteSensor = (id: number) => {
-    setSensors(sensors.filter(sensor => sensor.id !== id));
+  const fetchMachines = async () => {
+    try {
+      const res = await fetch(`${API_MACHINES_BASE}/`);
+      if (!res.ok) throw new Error(`Error al cargar máquinas: ${res.status}`);
+      const data: Machine[] = await res.json();
+      setMachines(data);
+    } catch (err) {
+      console.error("Error loading machines:", err);
+    }
   };
 
-  const openEditDialog = (sensor: any) => {
+  const fetchLocations = async () => {
+    try {
+      const res = await fetch(`${API_LOCATIONS_BASE}/`);
+      if (!res.ok) throw new Error(`Error al cargar lugares: ${res.status}`);
+      const data: Location[] = await res.json();
+      setLocations(data);
+    } catch (err) {
+      console.error("Error loading locations:", err);
+    }
+  };
+
+  useEffect(() => {
+    fetchSensors();
+    fetchMachines();
+    fetchLocations();
+  }, []);
+
+  const handleAddSensor = async () => {
+    try {
+      const res = await fetch(`${API_BASE}/create`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(newSensor),
+      });
+      if (!res.ok) throw new Error(`Create error: ${res.status}`);
+      // reload list after create
+      await fetchSensors();
+      setNewSensor({ Name: "", Serial: "", Location: "", Range: 0 });
+      setIsAddDialogOpen(false);
+    } catch (err) {
+      console.error("Error creating sensor:", err);
+    }
+  };
+
+  const handleEditSensor = async () => {
+    // No update endpoint specified. Update local state only for now.
+    if (currentSensor) {
+      setSensors(sensors.map(s => s.Serial === currentSensor.Serial ? currentSensor : s));
+      setIsEditDialogOpen(false);
+      // TODO: call update endpoint when available
+    }
+  };
+
+  const handleDeleteSensor = async (serial: string) => {
+    try {
+      const url = `${API_BASE}/delete?serial=${encodeURIComponent(serial)}`;
+      const res = await fetch(url, { method: "DELETE" });
+      if (!res.ok) throw new Error(`Delete error: ${res.status}`);
+      await fetchSensors();
+    } catch (err) {
+      console.error("Error deleting sensor:", err);
+    }
+  };
+
+  const openEditDialog = (sensor: Sensor) => {
     setCurrentSensor({ ...sensor });
     setIsEditDialogOpen(true);
   };
+
+  const handleCreateAlarm = async () => {
+    try {
+      const response = await fetch("http://localhost:8080/api/alarms/create", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(newAlarm),
+      });
+      if (response.ok) {
+        setNewAlarm({ Name: "", Serial_sensor: "", Type: 1, Message: "" });
+        setIsAddAlarmDialogOpen(false);
+      }
+    } catch (error) {
+      console.error("Error creating alarm:", error);
+    }
+  };
+
+  const openAddDialog = () => {
+    setAddSensorSelectedLocation(null);
+    setIsAddDialogOpen(true);
+  };
+
+  const handleLocationChange = (locationName: string) => {
+    setSelectedLocation(locationName === "all" ? "" : locationName);
+    setSelectedMachine(""); // Reset machine filter when location changes
+  };
+
+  // Create a map for quick lookup of a machine's location
+  const machineToLocationMap = new Map(machines.map(m => [m.Name, m.Location]));
+
+  // Filter machines based on the selected location
+  const filteredMachinesForTable = selectedLocation && selectedLocation !== "all"
+    ? machines.filter(m => m.Location === selectedLocation)
+    : [];
+
+  // Filter sensors based on selected location and machine
+  const filteredSensors = sensors.filter(sensor => {
+    const sensorLocation = machineToLocationMap.get(sensor.Location);
+    const locationMatch = !selectedLocation || selectedLocation === "all" || sensorLocation === selectedLocation;
+    const machineMatch = !selectedMachine || sensor.Location === selectedMachine;
+    return locationMatch && machineMatch;
+  });
+
+  // Reset filters
+  const resetFilters = () => {
+    setSelectedLocation("all");
+    setSelectedMachine("");
+  };
+
+  const machinesForAddDialog = addSensorSelectedLocation
+    ? machines.filter(m => m.Location === addSensorSelectedLocation)
+    : [];
 
   return (
     <div className="space-y-6">
@@ -85,80 +225,6 @@ const Configuration = () => {
               Administre y configure sus sensores de vibración inalámbricos
             </CardDescription>
           </div>
-          <Dialog open={isAddDialogOpen} onOpenChange={setIsAddDialogOpen}>
-            <DialogTrigger asChild>
-              <Button className="bg-brand-DEFAULT hover:bg-brand-dark">
-                <PlusCircle className="w-4 h-4 mr-2" />
-                Agregar Sensor
-              </Button>
-            </DialogTrigger>
-            <DialogContent>
-              <DialogHeader>
-                <DialogTitle>Agregar Nuevo Sensor</DialogTitle>
-              </DialogHeader>
-              <div className="grid gap-4 py-4">
-                <div className="grid gap-2">
-                  <Label htmlFor="name">Nombre</Label>
-                  <Input
-                    id="name"
-                    value={newSensor.name}
-                    onChange={(e) => setNewSensor({ ...newSensor, name: e.target.value })}
-                  />
-                </div>
-                <div className="grid gap-2">
-                  <Label htmlFor="location">Ubicación</Label>
-                  <Input
-                    id="location"
-                    value={newSensor.location}
-                    onChange={(e) => setNewSensor({ ...newSensor, location: e.target.value })}
-                  />
-                </div>
-                <div className="grid gap-2">
-                  <Label htmlFor="macAddress">Dirección MAC</Label>
-                  <Input
-                    id="macAddress"
-                    value={newSensor.macAddress}
-                    onChange={(e) => setNewSensor({ ...newSensor, macAddress: e.target.value })}
-                  />
-                </div>
-                <div className="grid gap-2">
-                  <Label htmlFor="threshold">Umbral de Alerta (Hz)</Label>
-                  <Input
-                    id="threshold"
-                    type="number"
-                    value={newSensor.threshold}
-                    onChange={(e) => setNewSensor({ ...newSensor, threshold: parseInt(e.target.value) })}
-                  />
-                </div>
-                <div className="grid gap-2">
-                  <Label htmlFor="interval">Intervalo de Lectura (min)</Label>
-                  <Select 
-                    value={newSensor.interval.toString()}
-                    onValueChange={(value) => setNewSensor({ ...newSensor, interval: parseInt(value) })}
-                  >
-                    <SelectTrigger>
-                      <SelectValue placeholder="Seleccionar intervalo" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="1">1 minuto</SelectItem>
-                      <SelectItem value="5">5 minutos</SelectItem>
-                      <SelectItem value="10">10 minutos</SelectItem>
-                      <SelectItem value="15">15 minutos</SelectItem>
-                      <SelectItem value="30">30 minutos</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
-              </div>
-              <div className="flex justify-end">
-                <Button variant="outline" className="mr-2" onClick={() => setIsAddDialogOpen(false)}>
-                  Cancelar
-                </Button>
-                <Button className="bg-brand-DEFAULT hover:bg-brand-dark" onClick={handleAddSensor}>
-                  Guardar
-                </Button>
-              </div>
-            </DialogContent>
-          </Dialog>
         </CardHeader>
         <CardContent>
           <Tabs defaultValue="list">
@@ -166,45 +232,174 @@ const Configuration = () => {
               <TabsTrigger value="list">Lista de Sensores</TabsTrigger>
               <TabsTrigger value="mqtt">Configuración MQTT</TabsTrigger>
               <TabsTrigger value="system">Configuración del Sistema</TabsTrigger>
+              <TabsTrigger value="alarm">Configuración de alarmas</TabsTrigger>
+              <TabsTrigger value="machines">Máquinas y Lugares</TabsTrigger>
             </TabsList>
             <TabsContent value="list">
+              <div className="flex items-center justify-between gap-4 mb-4 p-4 border-b">
+                <div className="flex items-center gap-4">
+                  <div className="grid gap-2">
+                    <Label htmlFor="filter-location">Filtrar por Lugar</Label>
+                    <Select onValueChange={handleLocationChange} value={selectedLocation || "all"}>
+                      <SelectTrigger id="filter-location" className="w-[180px]">
+                        <SelectValue placeholder="Todos los lugares" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="all">Todos los lugares</SelectItem>
+                        {locations.map((loc) => (
+                          <SelectItem key={loc.Name} value={loc.Name}>{loc.Name}</SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
+                  <div className="grid gap-2">
+                    <Label htmlFor="filter-machine">Filtrar por Máquina</Label>
+                    <Select
+                      onValueChange={(value) => setSelectedMachine(value)}
+                      value={selectedMachine || "all"}
+                      disabled={!selectedLocation || selectedLocation === "all"}
+                    >
+                      <SelectTrigger id="filter-machine" className="w-[180px]">
+                        <SelectValue placeholder="Todas las máquinas" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="all">Todas las máquinas</SelectItem>
+                        {filteredMachinesForTable.map((machine) => (
+                          <SelectItem key={machine.Name} value={machine.Name}>{machine.Name}</SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
+                  <div className="self-end">
+                    <Button variant="outline" onClick={resetFilters}>Limpiar Filtros</Button>
+                  </div>
+                </div>
+                <div className="self-end">
+                  <Dialog open={isAddDialogOpen} onOpenChange={(open) => { if (!open) { setIsAddDialogOpen(false); setAddSensorSelectedLocation(null); } else { openAddDialog(); }}}>
+                    <DialogTrigger asChild>
+                      <Button className="bg-blue-600 hover:bg-brand-dark">
+                        <PlusCircle className="w-4 h-4 mr-2" />
+                        Agregar Sensor
+                      </Button>
+                    </DialogTrigger>
+                    <DialogContent>
+                      <DialogHeader>
+                        <DialogTitle>Agregar Nuevo Sensor</DialogTitle>
+                      </DialogHeader>
+                      <div className="grid gap-4 py-4">
+                        <div className="grid gap-2">
+                          <Label htmlFor="name">Nombre</Label>
+                          <Input
+                            id="name"
+                            value={newSensor.Name}
+                            onChange={(e) => setNewSensor({ ...newSensor, Name: e.target.value })}
+                          />
+                        </div>
+                        <div className="grid gap-2">
+                          <Label htmlFor="serial">Número serial</Label>
+                          <Input
+                            id="serial"
+                            value={newSensor.Serial}
+                            onChange={(e) => setNewSensor({ ...newSensor, Serial: e.target.value })}
+                          />
+                        </div>
+                        <div className="grid gap-2">
+                          <Label htmlFor="add-location">Lugar</Label>
+                          <Select onValueChange={(value) => {
+                              setAddSensorSelectedLocation(value);
+                              setNewSensor({ ...newSensor, Location: "" }); // Reset machine selection
+                            }}
+                            value={addSensorSelectedLocation || ""}
+                          >
+                            <SelectTrigger id="add-location">
+                              <SelectValue placeholder="Seleccione un lugar" />
+                            </SelectTrigger>
+                            <SelectContent>
+                              {locations.map((loc) => (
+                                <SelectItem key={loc.Name} value={loc.Name}>{loc.Name}</SelectItem>
+                              ))}
+                            </SelectContent>
+                          </Select>
+                        </div>
+                        <div className="grid gap-2">
+                          <Label htmlFor="add-machine">Máquina</Label>
+                          <Select
+                            onValueChange={(value) => setNewSensor({ ...newSensor, Location: value })}
+                            value={newSensor.Location}
+                            disabled={!addSensorSelectedLocation}
+                          >
+                            <SelectTrigger id="add-machine">
+                              <SelectValue placeholder="Seleccione una máquina" />
+                            </SelectTrigger>
+                            <SelectContent>
+                              {machinesForAddDialog.map((machine) => (
+                                <SelectItem key={machine.Name} value={machine.Name}>{machine.Name}</SelectItem>
+                              ))}
+                            </SelectContent>
+                          </Select>
+                        </div>
+                        <div className="grid gap-2">
+                          <Label htmlFor="range">Rango</Label>
+                          <Input
+                            id="range"
+                            type="number"
+                            value={newSensor.Range}
+                            onChange={(e) => setNewSensor({ ...newSensor, Range: parseFloat(e.target.value || "0") })}
+                          />
+                        </div>
+                      </div>
+                      <div className="flex justify-end">
+                        <Button variant="outline" className="mr-2" onClick={() => setIsAddDialogOpen(false)}>
+                          Cancelar
+                        </Button>
+                        <Button className="bg-blue-600 hover:bg-brand-dark" onClick={handleAddSensor}>
+                          Guardar
+                        </Button>
+                      </div>
+                    </DialogContent>
+                  </Dialog>
+                </div>
+              </div>
               <Table>
                 <TableHeader>
                   <TableRow>
                     <TableHead>Nombre</TableHead>
-                    <TableHead>Ubicación</TableHead>
-                    <TableHead>Numero serial</TableHead>
-                    <TableHead>Umbral (Hz)</TableHead>
-                    <TableHead>Intervalo</TableHead>
+                    <TableHead>Lugar</TableHead>
+                    <TableHead>Máquina</TableHead>
+                    <TableHead>Serial</TableHead>
+                    <TableHead>Rango</TableHead>
                     <TableHead className="text-right">Acciones</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
-                  {sensors.map((sensor) => (
-                    <TableRow key={sensor.id}>
-                      <TableCell>{sensor.name}</TableCell>
-                      <TableCell>{sensor.location}</TableCell>
-                      <TableCell className="font-mono text-sm">{sensor.macAddress}</TableCell>
-                      <TableCell>{sensor.threshold} Hz</TableCell>
-                      <TableCell>{sensor.interval} min</TableCell>
-                      <TableCell className="text-right">
-                        <Button
-                          variant="ghost"
-                          size="sm"
-                          onClick={() => openEditDialog(sensor)}
-                        >
-                          <Edit className="h-4 w-4" />
-                        </Button>
-                        <Button
-                          variant="ghost"
-                          size="sm"
-                          onClick={() => handleDeleteSensor(sensor.id)}
-                        >
-                          <Trash2 className="h-4 w-4 text-dashboard-danger" />
-                        </Button>
-                      </TableCell>
-                    </TableRow>
-                  ))}
+                  {filteredSensors.map((sensor) => {
+                    const placeName = machineToLocationMap.get(sensor.Location) || 'N/A';
+                    return (
+                      <TableRow key={sensor.Serial}>
+                        <TableCell>{sensor.Name}</TableCell>
+                        <TableCell>{placeName}</TableCell>
+                        <TableCell>{sensor.Location}</TableCell>
+                        <TableCell className="font-mono text-sm">{sensor.Serial}</TableCell>
+                        <TableCell>{sensor.Range} minutos</TableCell>
+                        <TableCell className="text-right">
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            onClick={() => openEditDialog(sensor)}
+                          >
+                            <Edit className="h-4 w-4" />
+                          </Button>
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            onClick={() => handleDeleteSensor(sensor.Serial)}
+                          >
+                            <Trash2 className="h-4 w-4 text-dashboard-danger" />
+                          </Button>
+                        </TableCell>
+                      </TableRow>
+                    );
+                  })}
                 </TableBody>
               </Table>
             </TabsContent>
@@ -299,6 +494,12 @@ const Configuration = () => {
                 </CardContent>
               </Card>
             </TabsContent>
+            <TabsContent value="alarm">
+                  <AlarmPanel sensors={sensors}/>
+            </TabsContent>
+            <TabsContent value="machines">
+              <MachineLocationPanel />
+            </TabsContent>
           </Tabs>
         </CardContent>
       </Card>
@@ -314,52 +515,63 @@ const Configuration = () => {
                 <Label htmlFor="edit-name">Nombre</Label>
                 <Input
                   id="edit-name"
-                  value={currentSensor.name}
-                  onChange={(e) => setCurrentSensor({ ...currentSensor, name: e.target.value })}
+                  value={currentSensor.Name}
+                  onChange={(e) => setCurrentSensor({ ...currentSensor, Name: e.target.value })}
                 />
               </div>
               <div className="grid gap-2">
-                <Label htmlFor="edit-location">Ubicación</Label>
+                <Label htmlFor="edit-serial">Número serial</Label>
                 <Input
-                  id="edit-location"
-                  value={currentSensor.location}
-                  onChange={(e) => setCurrentSensor({ ...currentSensor, location: e.target.value })}
+                  id="edit-serial"
+                  value={currentSensor.Serial}
+                  onChange={(e) => setCurrentSensor({ ...currentSensor, Serial: e.target.value })}
                 />
               </div>
-              <div className="grid gap-2">
-                <Label htmlFor="edit-macAddress">Dirección MAC</Label>
-                <Input
-                  id="edit-macAddress"
-                  value={currentSensor.macAddress}
-                  onChange={(e) => setCurrentSensor({ ...currentSensor, macAddress: e.target.value })}
-                />
-              </div>
-              <div className="grid gap-2">
-                <Label htmlFor="edit-threshold">Umbral de Alerta (Hz)</Label>
-                <Input
-                  id="edit-threshold"
-                  type="number"
-                  value={currentSensor.threshold}
-                  onChange={(e) => setCurrentSensor({ ...currentSensor, threshold: parseInt(e.target.value) })}
-                />
-              </div>
-              <div className="grid gap-2">
-                <Label htmlFor="edit-interval">Intervalo de Lectura (min)</Label>
-                <Select 
-                  value={currentSensor.interval.toString()}
-                  onValueChange={(value) => setCurrentSensor({ ...currentSensor, interval: parseInt(value) })}
+               <div className="grid gap-2">
+                <Label htmlFor="edit-dialog-location">Lugar</Label>
+                <Select
+                  onValueChange={(value) => {
+                    setCurrentSensor({ ...currentSensor, Location: "" }); // Reset machine on location change
+                    setAddSensorSelectedLocation(value);
+                  }}
+                  value={addSensorSelectedLocation || machineToLocationMap.get(currentSensor.Location) || ""}
                 >
-                  <SelectTrigger>
-                    <SelectValue placeholder="Seleccionar intervalo" />
+                  <SelectTrigger id="edit-dialog-location">
+                    <SelectValue placeholder="Seleccione un lugar" />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="1">1 minuto</SelectItem>
-                    <SelectItem value="5">5 minutos</SelectItem>
-                    <SelectItem value="10">10 minutos</SelectItem>
-                    <SelectItem value="15">15 minutos</SelectItem>
-                    <SelectItem value="30">30 minutos</SelectItem>
+                    {locations.map((loc) => (
+                      <SelectItem key={loc.Name} value={loc.Name}>{loc.Name}</SelectItem>
+                    ))}
                   </SelectContent>
                 </Select>
+              </div>
+              <div className="grid gap-2">
+                <Label htmlFor="edit-dialog-machine">Máquina</Label>
+                <Select
+                  onValueChange={(value) => setCurrentSensor({ ...currentSensor, Location: value, })}
+                  value={currentSensor.Location || ""}
+                  disabled={!addSensorSelectedLocation && !machineToLocationMap.get(currentSensor.Location)}
+                >
+                  <SelectTrigger id="edit-dialog-machine">
+                    <SelectValue placeholder="Seleccione una máquina" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {(addSensorSelectedLocation ? machines.filter(m => m.Location === addSensorSelectedLocation) : machines)
+                      .map((machine) => (
+                        <SelectItem key={machine.Name} value={machine.Name}>{machine.Name}</SelectItem>
+                      ))}
+                  </SelectContent>
+                </Select>
+              </div>
+              <div className="grid gap-2">
+                <Label htmlFor="edit-range">Rango</Label>
+                <Input
+                  id="edit-range"
+                  type="number"
+                  value={currentSensor.Range}
+                  onChange={(e) => setCurrentSensor({ ...currentSensor, Range: parseFloat(e.target.value || "0") })}
+                />
               </div>
             </div>
           )}

@@ -1,4 +1,3 @@
-
 [
   {
     "id": 1,
@@ -8,16 +7,16 @@
         "id": 11,
         "name": "Bomba A",
         "sensors": [
-          "Sensor Vibración 1",
-          "Sensor Vibración 2"
+          "49240832",
+          "49241080"
         ]
       },
       {
         "id": 12,
         "name": "Bomba B",
         "sensors": [
-          "Sensor Vibración 3",
-          "Sensor Vibración 4"
+          "49240831",
+          "13240115"
         ]
       }
     ]
@@ -30,7 +29,16 @@
         "id": 21,
         "name": "Bomba C",
         "sensors": [
-          "Sensor Vibración 5"
+          "SV-CB2-BC-005",
+          "SV-CB2-BC-006"
+        ]
+      },
+      {
+        "id": 22,
+        "name": "Bomba D",
+        "sensors": [
+          "SV-CB2-BD-007",
+          "SV-CB2-BD-008"
         ]
       }
     ]

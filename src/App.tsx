@@ -6,7 +6,7 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route, HashRouter  } from "react-router-dom";
 import DashboardLayout from "./components/layout/DashboardLayout";
 import Dashboard from "./pages/Dashboard";
-import AlarmPanel from "./pages/AlarmPanel"
+import AlarmRecord from "./pages/AlarmRecord";
 import Configuration from "./pages/Configuration";
 import Visualization from "./pages/Visualization";
 import NotFound from "./pages/NotFound";
@@ -54,7 +54,7 @@ const App = () => {
             path="/alarm" 
             element={
               <DashboardLayout>
-                <AlarmPanel />
+                <AlarmRecord />
               </DashboardLayout>
             } 
           />
