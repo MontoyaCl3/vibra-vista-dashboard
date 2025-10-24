@@ -5,36 +5,69 @@ import DashboardSidebarGroup from "../components/layout/DashboardSidebarGroup";
 import InteractiveChartTabs from "../components/graphs/OverAllGraph";
 
 const Visualization = () => {
-  const [data, setData] = useState([]);
+  const [overallData, setOverallData] = useState([]); // For InteractiveChartTabs (historical)
+  const [dailyData, setDailyData] = useState([]); // For CreateGraph (date-filtered)
   const [filterDate, setFilterDate] = useState("");
-  const [filterTime, setFilterTime] = useState("");
+  const [filterTime, setFilterTime] = useState<string>("");
   const [selectedSensorSerial, setSelectedSensorSerial] = useState<string | null>(null);
   const [fetchError, setFetchError] = useState<string | null>(null);
-  console.log(selectedSensorSerial)
+  const [isLoading, setIsLoading] = useState(false);
 
+  // Effect for fetching ALL data for the selected sensor (for InteractiveChartTabs)
   useEffect(() => {
     if (!selectedSensorSerial) {
-      setData([]);
+      setOverallData([]);
       setFetchError(null);
       return;
     }
 
-    setFetchError(null);
     const controller = new AbortController();
     const signal = controller.signal;
 
     (async () => {
-      const url = `http://localhost:8080/api/measures/by-serial?serial=${encodeURIComponent(
-        selectedSensorSerial
-      )}`;
+      const url = `http://localhost:8080/api/measures/by-serial?serial=${encodeURIComponent(selectedSensorSerial)}`;
+      try {
+        const res = await fetch(url, { signal });
+        if (!res.ok) throw new Error(`Error ${res.status}: No se pudieron cargar los datos históricos.`);
+        const json = await res.json();
+        setOverallData(Array.isArray(json) ? json : []);
+      } catch (err) {
+        if (err.name !== "AbortError") {
+          setFetchError("Error al cargar el historial del sensor.");
+        }
+      }
+    })();
+
+    return () => controller.abort();
+  }, [selectedSensorSerial]);
+
+  // Effect for fetching data for a specific DATE (for CreateGraph)
+  useEffect(() => {
+    // No fetch if date is not selected, unless you want to show all data initially
+    if (!filterDate) {
+      setDailyData([]);
+      return;
+    }
+
+    setFetchError(null);
+    setIsLoading(true);
+    const controller = new AbortController();
+    const signal = controller.signal;
+
+    (async () => {
+      // Pass date to the API
+      let url = `http://localhost:8080/api/measures/by-serial?serial=${encodeURIComponent(selectedSensorSerial!)}`;
+      if (filterDate) {
+        url += `&date=${filterDate}`;
+      }
       console.log("Fetching:", url);
       try {
         const res = await fetch(url, { signal });
         if (!res.ok) {
           const text = await res.text().catch(() => "");
           console.error("Fetch failed:", res.status, res.statusText, text);
-          setFetchError(`Error ${res.status}: ${res.statusText}`);
-          setData([]);
+          setFetchError(`Error ${res.status}: No se pudieron cargar los datos.`);
+          setDailyData([]); // Clear data on error
           return;
         }
         const json = await res.json();
@@ -59,29 +92,30 @@ const Visualization = () => {
           Fs: Number(it.Fs) || it.Fs,
         });
 
-        setData(Array.isArray(json) ? json.map(normalize) : []);
+        setDailyData(Array.isArray(json) ? json.map(normalize) : []);
       } catch (err) {
         if (err.name === "AbortError") return;
-        console.error("Fetch error:", err);
-        setFetchError(String(err));
-        setData([]);
+        console.error("Fetch error:", err.message);
+        setFetchError("Error de conexión al intentar obtener los datos.");
+        setDailyData([]);
+      } finally {
+        setIsLoading(false);
       }
     })();
 
     return () => controller.abort();
-  }, [selectedSensorSerial]);
+  }, [selectedSensorSerial, filterDate]); // This effect depends on both
 
-  // Filtrado de los datos segun el form
-  const filteredData = data.filter(item => {
-    const itemDate = item.Timestamp ? item.Timestamp.split("T")[0] : item.Time?.split("T")[0];
-    return !filterDate || itemDate === filterDate;
-  });
+  // The data is now pre-filtered by the backend based on `filterDate`.
+  // `filteredData` is just `data`.
+  const filteredData = dailyData;
 
   // Si filterTime contiene un timestamp (value del <option>), buscar por ese timestamp exacto.
   // Si no hay filterTime, no se selecciona ningún elemento (puedes cambiar a filteredData[0] si quieres mostrar el primero).
   const dataFilter = filterTime
     ? filteredData.find(item => {
-        const ts = item.Timestamp ?? item.Time;
+        // Use the exact timestamp for matching
+        const ts = item.Timestamp ?? item.Time; 
         return ts === filterTime;
       })
     : undefined;
@@ -133,7 +167,7 @@ const Visualization = () => {
     <section className="flex p-0 w-full h-screen">
       <DashboardSidebarGroup onSensorClick={(serial) => setSelectedSensorSerial(serial)} />
       <div className="w-full h-auto">
-        <InteractiveChartTabs data={data} />
+        <InteractiveChartTabs key={selectedSensorSerial} data={overallData} />
         {/* Mostrar el serial seleccionado (opcional) */}
         <div className="p-2 text-sm text-gray-700">Sensor seleccionado: {selectedSensorSerial ?? "Ninguno"}</div>
         
@@ -148,7 +182,7 @@ const Visualization = () => {
               <option value="">-- : -- --</option>
               {filterDate &&
                 filteredData.map((item, index) => {
-                  const ts = item.Timestamp ?? item.Time;
+                  const ts = item.Timestamp ?? item.Time; // Use the exact timestamp as value
                   const hora = ts
                     ? new Date(ts).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })
                     : "";
@@ -162,16 +196,23 @@ const Visualization = () => {
             <input
               type="date"
               value={filterDate}
-              onChange={(e) => setFilterDate(e.target.value)}
+              onChange={(e) => {
+                setFilterDate(e.target.value);
+                setFilterTime(""); // Reset time when date changes
+              }}
               className="p-2 h-10 border-gray-400 border-2 rounded"
             />
           </section>
           <section className="w-full h-60 py-10 flex justify-center">
             {/* Grafica de forma de onda en aceleracion */}
-            {dataFilter?.X && dataFilter?.Y && dataFilter?.Z ? (
+            {isLoading ? (
+              <p className="text-2xl">Cargando datos...</p>
+            ) : fetchError ? (
+              <p className="text-2xl text-red-500">{fetchError}</p>
+            ) : dataFilter?.X && dataFilter?.Y && dataFilter?.Z ? (
               <CreateGraph data={dataFilter} Samples = {dataFilter.Samples} Fs = {dataFilter.Fs} />
             ) : (
-              <p className="text-2xl">Selecciona datos validos en la parte superior</p>
+              <p className="text-2xl">Selecciona un sensor y una fecha para ver los datos.</p>
             )}
           </section>
         </div>

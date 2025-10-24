@@ -1,0 +1,118 @@
+[33mcommit b032d29fbc34a86571caaa1a58c27c6dca84f51a[m[33m ([m[1;36mHEAD[m[33m, [m[1;32mmain[m[33m)[m
+Author: MontoyaCl3 <cmontoya2739@gmail.com>
+Date:   Thu Oct 23 08:32:35 2025 -0500
+
+    Version 10/23/2025, Se agrego la configuracion por base de datos
+
+[33mcommit 41e846433372b08bfe3585d93e7ed4bfd74a3d1a[m
+Author: MontoyaCl3 <cmontoya2739@gmail.com>
+Date:   Thu Oct 16 11:58:21 2025 -0500
+
+    Version antes de añadri al funcionalidad de las graficas con el crud
+
+[33mcommit f97c3b62cf59b9b51d7884e331ad3f3cf64651ac[m
+Author: MontoyaCl3 <cmontoya2739@gmail.com>
+Date:   Tue Sep 30 14:29:32 2025 -0500
+
+    Cambios de 09/30/2025
+
+[33mcommit f959de51cf5a9c95f3b4ecfb4aff4a4931092bf8[m
+Author: MontoyaCl3 <cmontoya2739@gmail.com>
+Date:   Wed Jul 23 16:21:46 2025 -0500
+
+    WIP: cambios antes de cambiar a gh-pages
+
+[33mcommit 862c6fc4f97546e5d8c1b97be7194ffb3b573d1a[m[33m ([m[1;32mprueba[m[33m, [m[1;32m03df3b6857727b41714f53a5c43ef66c6c65ab34[m[33m)[m
+Author: MontoyaCl3 <cmontoya2739@gmail.com>
+Date:   Mon Jun 9 16:13:20 2025 -0500
+
+    aaaaa
+
+[33mcommit 03df3b6857727b41714f53a5c43ef66c6c65ab34[m
+Author: MontoyaCl3 <cmontoya2739@gmail.com>
+Date:   Mon Jun 9 14:29:43 2025 -0500
+
+    bbb
+
+[33mcommit 2cd59965a4c6d5b40b7282511b734d7adf5db42e[m
+Author: MontoyaCl3 <cmontoya2739@gmail.com>
+Date:   Mon Jun 9 14:11:53 2025 -0500
+
+    bb
+
+[33mcommit 8e49308115e1012ed4706aa38d71054381638605[m
+Author: MontoyaCl3 <cmontoya2739@gmail.com>
+Date:   Mon Jun 9 13:47:05 2025 -0500
+
+    vvv
+
+[33mcommit 930fc56469350029ffce63fed42382d6fa5ac43c[m
+Author: MontoyaCl3 <cmontoya2739@gmail.com>
+Date:   Mon Jun 9 13:27:01 2025 -0500
+
+    aaaaa
+
+[33mcommit 5238c1ce89180d3fd38c5b120a6d2fcf9bab5d8b[m
+Author: MontoyaCl3 <cmontoya2739@gmail.com>
+Date:   Mon Jun 9 12:18:17 2025 -0500
+
+    aaa
+
+[33mcommit 6ed72840c7de7d8f0f9b76b2f5f00030c73870b6[m
+Author: MontoyaCl3 <cmontoya2739@gmail.com>
+Date:   Mon Jun 9 12:12:02 2025 -0500
+
+    run build 3
+
+[33mcommit 12e9944f7bffb37185d0bdedaaa90e25643c277c[m
+Author: MontoyaCl3 <cmontoya2739@gmail.com>
+Date:   Mon Jun 9 12:10:01 2025 -0500
+
+    run build 2
+
+[33mcommit 82a0ba973636a45d4ecc0401898fc75372e4c4ba[m
+Author: MontoyaCl3 <cmontoya2739@gmail.com>
+Date:   Mon Jun 9 11:58:14 2025 -0500
+
+    Run build
+
+[33mcommit d45c679ce91624e8aea11b7f1b67d43292ac2269[m
+Author: MontoyaCl3 <cmontoya2739@gmail.com>
+Date:   Tue May 27 16:39:24 2025 -0500
+
+    Version 1.2(Funcional con base de datos)
+
+[33mcommit a9f648662a6518a51feea716e74363886e978713[m
+Author: MontoyaCl3 <cmontoya2739@gmail.com>
+Date:   Tue May 27 14:58:02 2025 -0500
+
+    Version 1.1(Grafica funcional con zustand)
+
+[33mcommit b211cc87041756c435e595f40ac96bb63931ff99[m
+Author: MontoyaCl3 <cmontoya2739@gmail.com>
+Date:   Tue May 27 11:14:12 2025 -0500
+
+    Version 1.0
+
+[33mcommit 4bf48c5e2438fbeb7a3fbc45a576befc1d25f4f9[m
+Author: gpt-engineer-app[bot] <159125892+gpt-engineer-app[bot]@users.noreply.github.com>
+Date:   Tue May 27 13:19:42 2025 +0000
+
+    Feat: Implement logo and color scheme
+    
+    - Added the logo to the header.
+    - Updated the color palette to match the logo's colors.
+
+[33mcommit 1f8ce89ef2c5ad2f424f99bf6f1e27660cb23e31[m
+Author: gpt-engineer-app[bot] <159125892+gpt-engineer-app[bot]@users.noreply.github.com>
+Date:   Fri May 16 17:47:21 2025 +0000
+
+    feat: Create vibration sensor dashboard
+    
+    Implement a dashboard for wireless vibration sensors, including configuration and data visualization pages. The main page should display the overall sensor status, using a color palette based on #e91a2f for a professional look.
+
+[33mcommit 30e69a1fc449e3511dd102824343aa9e1a92b8dd[m
+Author: gpt-engineer-app[bot] <159125892+gpt-engineer-app[bot]@users.noreply.github.com>
+Date:   Fri May 16 17:41:51 2025 +0000
+
+    Use tech stack vite_react_shadcn_ts
