@@ -9,20 +9,6 @@ const CreateGraph = ({
   const [axis, setAxis] = useState("Z");
   const df = Fs/Samples
   console.log(df)
-  // Calcula velocidad por integración
-  function integrar(aceleracion, dt) {
-    const velocidad = [];
-    let suma = 0;
-    for (let i = 0; i < aceleracion.length; i++) {
-      if (i === 0) {
-        suma = 0;
-      } else {
-        suma += (((aceleracion[i] + aceleracion[i - 1])) / 2) * dt;
-      }
-      velocidad.push(suma * 9.8);
-    }
-    return velocidad;
-  }
 
   // Calcula FFT
   function nextPowerOfTwo(n) {
@@ -45,6 +31,12 @@ const CreateGraph = ({
     }
     return mag;
   }
+
+  const velocityAxisMap = {
+    X: "VelX",
+    Y: "VelY",
+    Z: "VelZ",
+  };
 
   // Obtiene los datos para graficar según pestaña y eje
   const getChartData = () => {
@@ -70,15 +62,15 @@ const CreateGraph = ({
       if (axis === "Todos") {
         return {
           series: [
-            { axis: "X", values: integrar(data.X, 1 / data.Fs) },
-            { axis: "Y", values: integrar(data.Y, 1 / data.Fs) },
-            { axis: "Z", values: integrar(data.Z, 1 / data.Fs) },
+            { axis: "X", values: data.VelX },
+            { axis: "Y", values: data.VelY },
+            { axis: "Z", values: data.VelZ },
           ],
           title: `Velocidad (Todos los ejes)`,
           yLabel: "Velocidad (m/s)",
         };
       }
-      values = integrar(data[axis], 1 / data.Fs);
+      values = data[velocityAxisMap[axis]];
       title = `Velocidad (${axis})`;
       yLabel = "Velocidad (m/s)";
     } else if (tab === "FFT") {
